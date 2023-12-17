@@ -1,0 +1,17 @@
+[DUCK]
+region = ru-ru
+fetch_timeout_sec = 13.5
+link_count_limit = 150
+
+[BRAIN]
+fetch_timeout_sec = 9.1
+kv_len_range = (2, 85)
+k_threshold = 71
+
+[SERVER]
+port = 8123
+debug = false
+reload = true
+
+[API]
+secret = 

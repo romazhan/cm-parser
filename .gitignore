@@ -1,0 +1,12 @@
+# Byte-compiled
+__pycache__/
+
+# Environments
+venv/
+
+# Configs
+category_dump.json
+config.ini
+
+# Logs
+error.log

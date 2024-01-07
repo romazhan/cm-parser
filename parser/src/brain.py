@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 from pydantic import BaseModel
-from aiohttp import ClientSession
+from curl_cffi.requests import AsyncSession
 
 from src.session import create_async_client
 from src.squeezer import Squeezer
@@ -62,10 +62,10 @@ class Brain(object):
         )) or None
 
     @classmethod
-    @nonstop(3, timeout_sec=1.7)
+    @nonstop(2, timeout_sec=1.7)
     async def _fetch_link_summary(
         cls,
-        client: ClientSession,
+        client: AsyncSession,
         link: str,
         product_model: str,
         attribute_names: list[str],
@@ -75,53 +75,56 @@ class Brain(object):
     ) -> LinkSummary | None:
         matched_key_data = {}
 
-        async with client.get(link, timeout=timeout_sec) as response:
-            assert response.status == 200, 'status code not 200'
+        splitted_link = link.split('/')
+        client.headers.update({
+            'Referer': f'{splitted_link[0]}//{splitted_link[2]}/'
+        })
 
-            response_text = await response.text()
+        response = await client.get(link, timeout=timeout_sec)
+        assert response.status_code == 200, 'status code not 200'
 
-            response_title = Squeezer.get_title(response_text)
-            if not response_title:
-                return None
+        response_title = Squeezer.get_title(response.text)
+        if not response_title:
+            return None
 
-            lowered_product_model = product_model.lower()
-            if lowered_product_model not in response_title.lower():
-                return None
+        lowered_product_model = product_model.lower()
+        if lowered_product_model not in response_title.lower():
+            return None
 
-            # lowered_response_text = response_text.lower()
-            # if not any(pmt.format(lowered_product_model) in lowered_response_text
-            #     for pmt in cls._PRODUCT_MODEL_TEMPLATES
-            # ) and not Squeezer.is_needle_at_end_tag_text(
-            #     remove_words(
-            #         remove_cyrillic(lowered_response_text),
-            #         cls._PRODUCT_LOWERED_COLORS
-            #     ),
-            #     lowered_product_model,
-            #     ignore_case=False
-            # ):
-            #     return None
+        # lowered_response_text = response.text.lower()
+        # if not any(pmt.format(lowered_product_model) in lowered_response_text
+        #     for pmt in cls._PRODUCT_MODEL_TEMPLATES
+        # ) and not Squeezer.is_needle_at_end_tag_text(
+        #     remove_words(
+        #         remove_cyrillic(lowered_response_text),
+        #         cls._PRODUCT_LOWERED_COLORS
+        #     ),
+        #     lowered_product_model,
+        #     ignore_case=False
+        # ):
+        #     return None
 
-            key_data = Squeezer.squeeze(response_text)
-            if not key_data:
-                return None
+        key_data = Squeezer.squeeze(response.text)
+        if not key_data:
+            return None
 
-            for k, v in key_data.items():
-                if len(set((len(k), len(v))).intersection(
-                    range(kv_len_range[0], kv_len_range[1] + 1
-                ))) != 2:
-                    continue
+        for k, v in key_data.items():
+            if len(set((len(k), len(v))).intersection(
+                range(kv_len_range[0], kv_len_range[1] + 1
+            ))) != 2:
+                continue
 
-                exed = fuzz_process.extractOne(
-                    query=k,
-                    choices=attribute_names,
-                    scorer=fuzz.token_sort_ratio,
-                    score_cutoff=k_threshold
-                ) if fuzz_utils.full_process(k) else None
-                if not exed:
-                    continue
+            exed = fuzz_process.extractOne(
+                query=k,
+                choices=attribute_names,
+                scorer=fuzz.token_sort_ratio,
+                score_cutoff=k_threshold
+            ) if fuzz_utils.full_process(k) else None
+            if not exed:
+                continue
 
-                if not matched_key_data.get(exed[0]) or matched_key_data[exed[0]].score < exed[1]:
-                    matched_key_data[exed[0]] = _MatchedData(score=exed[1], value=v)
+            if not matched_key_data.get(exed[0]) or matched_key_data[exed[0]].score < exed[1]:
+                matched_key_data[exed[0]] = _MatchedData(score=exed[1], value=v)
 
         return LinkSummary(
             link=link,

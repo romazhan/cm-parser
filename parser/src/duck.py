@@ -37,7 +37,7 @@ class Duck(object):
         ]
         assert links, 'no links'
 
-        return links
+        return list(set(links))
 
     @classmethod
     def _get_query_prefix(cls, region: str) -> str | None:

@@ -110,8 +110,8 @@ class Brain(object):
 
         for k, v in key_data.items():
             if len(set((len(k), len(v))).intersection(
-                range(kv_len_range[0], kv_len_range[1] + 1
-            ))) != 2:
+                range(kv_len_range[0], kv_len_range[1] + 1)
+            )) != 2:
                 continue
 
             exed = fuzz_process.extractOne(

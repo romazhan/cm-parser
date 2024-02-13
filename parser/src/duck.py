@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import annotations
+
 from duckduckgo_search import DDGS
 from src.utils.sugar import nonstop
 

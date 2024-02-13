@@ -1,4 +1,6 @@
 #-*- coding: utf-8 -*-
+from __future__ import annotations
+
 from bs4 import BeautifulSoup, Tag
 from src.utils.string import is_needle_at_end
 

@@ -9,6 +9,7 @@ kv_len_range = (2, 99)
 k_threshold = 71
 
 [SERVER]
+host = 127.0.0.1
 port = 8123
 debug = false
 reload = true

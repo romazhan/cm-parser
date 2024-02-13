@@ -114,18 +114,22 @@ _app.include_router(_app_router,
 )
 
 if __name__ == '__main__':
+    host = _confdad.get('SERVER', 'host')
+    port = _confdad.getint('SERVER', 'port')
+
     try:
         if _confdad.getboolean('SERVER', 'reload'):
             uvicorn.run(
                 '__main__:_app',
-                port=_confdad.getint('SERVER', 'port'),
+                host=host,
+                port=port,
                 reload=True,
                 reload_includes=[
                     '*.ini', '*.json'
                 ]
             )
         else:
-            uvicorn.run(_app, port=_confdad.getint('SERVER', 'port'))
+            uvicorn.run(_app, host=host, port=port)
     except Exception as e:
         e_message = f'[{datetime()}][unhandled]: {str(e) or "@empty"}'
 

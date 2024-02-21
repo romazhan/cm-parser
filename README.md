@@ -26,4 +26,4 @@ python parser/cli.py
 
 ## Global Dependencies
 
-- [Python](https://www.python.org/downloads) (tested on v3.11.4)
+- [Python](https://www.python.org/downloads) (tested on v3.8.10)

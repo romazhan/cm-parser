@@ -6,7 +6,7 @@ from src.utils.sugar import nonstop
 
 
 class Duck(object):
-    _BAD_LINK_SUBS = () # ('://www.kns',)
+    _BAD_LINK_SUBS = () # ('://www.site',)
     _QUERY_PREFIXES = {
         'ru-ru': 'Характеристики товара',
         'us-en': 'Product specifications'

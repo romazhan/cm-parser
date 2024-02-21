@@ -75,7 +75,7 @@ class Squeezer(object):
 
         extract_text(tag)
 
-        return {kv_array[0]: kv_array[1]} if kv_array else None
+        return {kv_array[0]: kv_array[1]} if len(kv_array) == 2 else None
 
     @staticmethod
     def _process_text(text: str, bad_regexp_pattern: str = r'\.{2,}') -> str | None:

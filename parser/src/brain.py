@@ -33,7 +33,7 @@ class Brain(object):
         'black', 'white', 'red', 'orange', 'yellow', 'green',
         'lightblue', 'blue', 'indigo', 'purple', 'violet', 'gray',
         'brown', 'pink', 'magenta', 'lime', 'coral', 'gold', 'silver',
-        'chocolate' # hihihiha
+        'chocolate' # heheheha
     )
 
     @classmethod

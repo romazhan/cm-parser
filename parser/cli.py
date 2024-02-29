@@ -42,8 +42,8 @@ async def _main() -> None:
     green = Green(_CATEGORY_DUMP_FILE_PATH)
     await green.load_category_dump()
 
-    attribute_names = green.get_attribute_fields('name', product_category_id)
-    assert attribute_names, 'no attributes found'
+    attributes = green.get_attributes(product_category_id)
+    assert attributes, 'no attributes found'
 
     duck = Duck(confdad.get('DUCK', 'region'))
     product_links = duck.get_links(
@@ -56,7 +56,7 @@ async def _main() -> None:
     summary = await Brain.get_product_summary(
         product_links,
         product_model=product_model,
-        attribute_names=attribute_names,
+        attributes=attributes,
         fetch_timeout_sec=confdad.getfloat('BRAIN', 'fetch_timeout_sec'),
         kv_len_range=confdad.gettupleint('BRAIN', 'kv_len_range'),
         k_threshold=confdad.getint('BRAIN', 'k_threshold')

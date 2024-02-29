@@ -41,7 +41,7 @@ class Brain(object):
         cls,
         product_links: list[str],
         product_model: str,
-        attribute_names: list[str],
+        attributes: list[dict[any]],
         fetch_timeout_sec: int | float = 11.0,
         kv_len_range: tuple[int, int | float] = (1, float('inf')),
         k_threshold: int = 80
@@ -52,7 +52,7 @@ class Brain(object):
                     client,
                     link=link,
                     product_model=product_model,
-                    attribute_names=attribute_names,
+                    attributes=attributes,
                     timeout_sec=fetch_timeout_sec,
                     kv_len_range=kv_len_range,
                     k_threshold=k_threshold
@@ -70,7 +70,7 @@ class Brain(object):
         client: AsyncSession,
         link: str,
         product_model: str,
-        attribute_names: list[str],
+        attributes: list[dict[any]],
         timeout_sec: int | float,
         kv_len_range: tuple[int, int | float],
         k_threshold: int
@@ -116,17 +116,18 @@ class Brain(object):
             )) != 2:
                 continue
 
-            exed = fuzz_process.extractOne(
-                query=k,
-                choices=attribute_names,
-                scorer=fuzz.token_sort_ratio,
-                score_cutoff=k_threshold
-            ) if fuzz_utils.full_process(k) else None
-            if not exed:
-                continue
+            for a in attributes:
+                exed = fuzz_process.extractOne(
+                    query=k,
+                    choices=[a['name'], *a['synonyms']],
+                    scorer=fuzz.token_sort_ratio,
+                    score_cutoff=k_threshold
+                ) if fuzz_utils.full_process(k) else None
+                if not exed:
+                    continue
 
-            if not matched_key_data.get(exed[0]) or matched_key_data[exed[0]].score < exed[1]:
-                matched_key_data[exed[0]] = _MatchedData(score=exed[1], value=v)
+                if not matched_key_data.get(a['name']) or matched_key_data[a['name']].score < exed[1]:
+                    matched_key_data[a['name']] = _MatchedData(score=exed[1], value=v)
 
         return LinkSummary(
             link=link,

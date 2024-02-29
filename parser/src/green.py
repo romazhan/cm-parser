@@ -23,9 +23,11 @@ class Green(object):
 
         return self._category_dump
 
-    def get_attribute_fields(self, field_name: str, category_id: int) -> list[dict[any]] | None:
+    def get_attributes(self, category_id: int) -> list[dict[any]] | None:
         assert self._category_dump, 'category dump not loaded'
 
-        return [a[field_name] for attribute_chunk in
-            (c['attributes'] for c in self._category_dump if int(c['id']) == int(category_id))
-        for a in attribute_chunk] or None
+        for c in self._category_dump:
+            if int(c['id']) == int(category_id):
+                return c['attributes']
+
+        return None

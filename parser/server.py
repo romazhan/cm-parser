@@ -57,8 +57,8 @@ def _register_routes(
         if not green.is_category_dump_loaded or random.randint(0, 12) == 0:
             await green.load_category_dump()
 
-        attribute_names = green.get_attribute_fields('name', request.category_id)
-        if not attribute_names:
+        attributes = green.get_attributes(request.category_id)
+        if not attributes:
             raise HTTPException(424, detail=f'no attributes found ({request.category_id})')
 
         product_links = duck.get_links(
@@ -72,7 +72,7 @@ def _register_routes(
         summary = await Brain.get_product_summary(
             product_links,
             product_model=request.product_model,
-            attribute_names=attribute_names,
+            attributes=attributes,
             fetch_timeout_sec=confdad.getfloat('BRAIN', 'fetch_timeout_sec'),
             kv_len_range=confdad.gettupleint('BRAIN', 'kv_len_range'),
             k_threshold=confdad.getint('BRAIN', 'k_threshold')

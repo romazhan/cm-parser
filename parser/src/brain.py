@@ -127,15 +127,10 @@ class Brain(object):
                     continue
 
                 if not matched_key_data.get(a['name']) or matched_key_data[a['name']].score < exed[1]:
-                    matched_key_data[a['name']] = _MatchedData(score=exed[1], value=v)
+                    matched_key_data[a['name']] = _MatchedData(score=exed[1], value=clear_string(v))
 
         return LinkSummary(
             link=link,
             title=clear_string(response_title),
-            key_data={
-                k: _MatchedData(
-                    score=matched_data.score,
-                    value=clear_string(matched_data.value)
-                ) for k, matched_data in matched_key_data.items()
-            }
+            key_data=matched_key_data
         ) if matched_key_data else None
